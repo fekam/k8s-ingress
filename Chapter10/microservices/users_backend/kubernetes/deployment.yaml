@@ -5,7 +5,7 @@ metadata:
     name: users-backend
     labels:
         app: users-backend
-    namespace: example
+    namespace: guerin
 spec:
     replicas: 1
     selector:

@@ -32,6 +32,8 @@ WORKDIR /opt/code
 RUN mkdir -p /opt/code/db
 # Add postgres setup
 ADD ./docker/db/postgres-setup.sh /opt/code/db/
+# Donner les permissions d'exécution
+RUN chmod +x /opt/code/db/postgres-setup.sh
 RUN  /opt/code/db/postgres-setup.sh
 
 ## Install our code to prepare the DB
@@ -43,6 +45,12 @@ RUN pip3 install -r requirements.txt
 ADD ./UsersBackend/ /opt/code/
 # Add all DB commanda
 ADD ./docker/db/* /opt/code/db/
+
+# Donner les permissions d'exécution
+RUN chmod +x /opt/code/db/prepare_db.sh
+RUN chmod +x /opt/code/db/start_postgres.sh
+RUN chmod +x /opt/code/db/stop_postgres.sh
+
 
 ## get the db ready
 RUN /opt/code/db/prepare_db.sh

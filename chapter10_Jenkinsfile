@@ -1,0 +1,64 @@
+pipeline {
+    agent any
+    stages {
+        stage('Clone Repository on Remote Server') {
+            steps {
+                script {
+                    sh '''
+                    ssh -o StrictHostKeyChecking=no -i /var/lib/jenkins/.ssh/master-node_key.pem ubuntu@20.220.168.106 << EOF
+                        echo "Cloning repository on remote server..."
+                        git clone https://github.com/fekam/k8s-ingress.git || echo "Repository already exists."
+                        echo "Task complete."
+                    EOF
+                    '''
+                }
+            }
+        }
+        stage('Start users_backend') {
+            steps {
+                dir('Chapter10/users_backend') {
+                    sh '''
+                        docker-compose up -d > docker-compose.log 2>&1
+                        echo "Logs captured in users_backend/docker-compose.log"
+                    '''
+                }
+            }
+        }
+        stage('Start thoughts_backend') {
+            steps {
+                dir('Chapter10/thoughts_backend') {
+                    sh '''
+                        docker-compose up -d > docker-compose.log 2>&1
+                        echo "Logs captured in thoughts_backend/docker-compose.log"
+                    '''
+                }
+            }
+        }
+        stage('Start rsyslog') {
+            steps {
+                dir('Chapter10/rsyslog') {
+                    sh '''
+                        docker-compose up -d > docker-compose.log 2>&1
+                        echo "Logs captured in rsyslog/docker-compose.log"
+                    '''
+                }
+            }
+        }
+        stage('Start frontend') {
+            steps {
+                dir('Chapter10/frontend') {
+                    sh '''
+                        docker-compose up -d > docker-compose.log 2>&1
+                        echo "Logs captured in frontend/docker-compose.log"
+                    '''
+                }
+            }
+        }
+    }
+    post {
+        always {
+            echo "Pipeline execution completed."
+            archiveArtifacts artifacts: '**/docker-compose.log', allowEmptyArchive: true
+        }
+    }
+}
