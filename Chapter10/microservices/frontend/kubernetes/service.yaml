@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-    namespace: example
+    namespace: guerin
     labels:
         app: frontend-service
     name: frontend-service
