@@ -3,7 +3,7 @@
   hosts: master
   #become: true  # Run tasks as a privileged user (sudo) sd
   vars:
-    app_dir: /home/ubuntu/Chapter10/thoughts_backend
+    app_dir: /home/ubuntu/Chapter10/microservices/users_backend/
     compose_file: docker-compose.yml
 
   tasks:
