@@ -3,10 +3,15 @@
   hosts: master
   #become: true  # Run tasks as a privileged user (sudo)
   vars:
-    app_dir: ./thoughts_backend
+    app_dir: /home/ubuntu/Chapter10/thoughts_backend
     compose_file: docker-compose.yml
 
   tasks:
+    - name: Copy chapter10 directory to the remote machine
+      copy:
+        src: ./Chapter10/*
+        dest: /home/ubuntu/Chapter10
+        mode: '0755'
 
     - name: Start the thoughts_backend services
       command:

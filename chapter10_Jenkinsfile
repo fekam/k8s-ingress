@@ -1,7 +1,6 @@
 pipeline {
     agent any
     stages {
-    stages {
         stage('Cloner le dépôt ou mettre à jour') {
             steps {
                 script {
@@ -9,63 +8,60 @@ pipeline {
                         # Vérifier si le dossier guerin-devops existe
                         if [ -d "guerin-devops" ]; then
                             timestamp=$(date +%Y%m%d%H%M%S)
-                            # Sauvegarde du dossier actuel
+                            echo "Sauvegarde du dossier existant guerin-devops"
                             mv guerin-devops guerin-devops-backup-$timestamp
 
                             # Limiter le nombre de sauvegardes à 2
                             backup_count=$(ls -dt guerin-devops-backup-* 2>/dev/null | wc -l)
                             if [ $backup_count -gt 2 ]; then
+                                echo "Suppression des anciennes sauvegardes"
                                 ls -dt guerin-devops-backup-* | tail -n +3 | xargs rm -rf
                             fi
                         fi
                         
-                        # Cloner le dépôt et passer au répertoire dev2
+                        # Cloner le dépôt
+                        echo "Clonage du dépôt depuis GitHub..."
                         git clone -b main https://github.com/fekam/k8s-ingress.git guerin-devops
-                        cd Chapter10
-
-
                     '''
                 }
             }
         }
-
-    stages {
         stage('Start users_backend') {
             steps {
-                dir('Chapter10/users_backend') {
+                dir('guerin-devops/Chapter10/users_backend') {
                     sh '''
                         echo "Running Ansible playbook for users_backend..."
-                        ansible-playbook -i inventory.yml ./ops/playbook-users_backend.yml
+                        ansible-playbook -i inventory.yml ./ops/playbook-users_backend.yml > ansible-playbook.log 2>&1
                     '''
                 }
             }
         }
         stage('Start thoughts_backend') {
             steps {
-                dir('Chapter10/thoughts_backend') {
+                dir('guerin-devops/Chapter10/thoughts_backend') {
                     sh '''
                         echo "Running Ansible playbook for thoughts_backend..."
-                        ansible-playbook -i inventory.yml playbook-thoughts_backend.yml
+                        ansible-playbook -i inventory.yml playbook-thoughts_backend.yml > ansible-playbook.log 2>&1
                     '''
                 }
             }
         }
         stage('Start rsyslog') {
             steps {
-                dir('Chapter10/rsyslog') {
+                dir('guerin-devops/Chapter10/rsyslog') {
                     sh '''
                         echo "Running Ansible playbook for rsyslog..."
-                        ansible-playbook -i inventory.yml playbook-rsyslog.yml
+                        ansible-playbook -i inventory.yml playbook-rsyslog.yml > ansible-playbook.log 2>&1
                     '''
                 }
             }
         }
         stage('Start frontend') {
             steps {
-                dir('Chapter10/frontend') {
+                dir('guerin-devops/Chapter10/frontend') {
                     sh '''
                         echo "Running Ansible playbook for frontend..."
-                        ansible-playbook -i inventory.yml playbook-frontend.yml
+                        ansible-playbook -i inventory.yml playbook-frontend.yml > ansible-playbook.log 2>&1
                     '''
                 }
             }
