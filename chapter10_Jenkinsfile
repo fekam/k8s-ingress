@@ -31,7 +31,7 @@ pipeline {
                 dir('guerin-devops/Chapter10/users_backend') {
                     sh '''
                         echo "Running Ansible playbook for users_backend..."
-                        ansible-playbook -i inventory.yml ./ops/playbook-users_backend.yml > ansible-playbook.log 2>&1
+                        ansible-playbook -i inventory.yml Chapter10/ops/playbook-users_backend.yml > ansible-playbook.log 2>&1
                     '''
                 }
             }
