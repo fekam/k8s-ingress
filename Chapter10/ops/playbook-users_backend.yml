@@ -9,7 +9,7 @@
   tasks:
     - name: Copy chapter10 directory to the remote machine
       copy:
-        src: ./Chapter10/*
+        src: ../../Chapter10/*
         dest: /home/ubuntu/Chapter10
         mode: '0755'
 
