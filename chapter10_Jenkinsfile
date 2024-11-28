@@ -38,10 +38,10 @@ pipeline {
         }
         stage('Start thoughts_backend') {
             steps {
-                dir('guerin-devops/Chapter10/thoughts_backend') {
+                dir('Chapter10) {
                     sh '''
                         echo "Running Ansible playbook for thoughts_backend..."
-                        ansible-playbook -i inventory.yml playbook-thoughts_backend.yml > ansible-playbook.log 2>&1
+                        ansible-playbook -i inventory ops/playbook-thoughts_backend.yml
                     '''
                 }
             }
@@ -51,17 +51,17 @@ pipeline {
                 dir('guerin-devops/Chapter10/rsyslog') {
                     sh '''
                         echo "Running Ansible playbook for rsyslog..."
-                        ansible-playbook -i inventory.yml playbook-rsyslog.yml > ansible-playbook.log 2>&1
+                        ansible-playbook -i inventory ops/playbook-rsyslog.yml
                     '''
                 }
             }
         }
         stage('Start frontend') {
             steps {
-                dir('guerin-devops/Chapter10/frontend') {
+                dir('Chapter10) {
                     sh '''
                         echo "Running Ansible playbook for frontend..."
-                        ansible-playbook -i inventory.yml playbook-frontend.yml > ansible-playbook.log 2>&1
+                        ansible-playbook -i inventory ops/playbook-frontend.yml
                     '''
                 }
             }
