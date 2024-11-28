@@ -28,10 +28,10 @@ pipeline {
         }
         stage('Start users_backend') {
             steps {
-                dir('guerin-devops/Chapter10/users_backend') {
+                dir('Chapter10') {
                     sh '''
                         echo "Running Ansible playbook for users_backend..."
-                        pwd && ansible-playbook -i inventory Chapter10/ops/playbook-users_backend.yml
+                        pwd && ansible-playbook -i inventory ops/playbook-users_backend.yml
                     '''
                 }
             }
