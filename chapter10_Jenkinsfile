@@ -1,25 +1,41 @@
 pipeline {
     agent any
     stages {
-        stage('Clone Repository on Remote Server') {
+    stages {
+        stage('Cloner le dépôt ou mettre à jour') {
             steps {
                 script {
                     sh '''
-                    ssh -o StrictHostKeyChecking=no -i /var/lib/jenkins/.ssh/master-node_key.pem ubuntu@20.220.168.106 << EOF
-                        echo "Cloning repository on remote server..."
-                        git clone https://github.com/fekam/k8s-ingress.git || echo "Repository already exists."
-                        echo "Task complete."
-                    EOF
+                        # Vérifier si le dossier guerin-devops existe
+                        if [ -d "guerin-devops" ]; then
+                            timestamp=$(date +%Y%m%d%H%M%S)
+                            # Sauvegarde du dossier actuel
+                            mv guerin-devops guerin-devops-backup-$timestamp
+
+                            # Limiter le nombre de sauvegardes à 2
+                            backup_count=$(ls -dt guerin-devops-backup-* 2>/dev/null | wc -l)
+                            if [ $backup_count -gt 2 ]; then
+                                ls -dt guerin-devops-backup-* | tail -n +3 | xargs rm -rf
+                            fi
+                        fi
+                        
+                        # Cloner le dépôt et passer au répertoire dev2
+                        git clone -b main https://github.com/fekam/k8s-ingress.git guerin-devops
+                        cd Chapter10
+
+
                     '''
                 }
             }
         }
+
+    stages {
         stage('Start users_backend') {
             steps {
                 dir('Chapter10/users_backend') {
                     sh '''
-                        docker-compose up -d > docker-compose.log 2>&1
-                        echo "Logs captured in users_backend/docker-compose.log"
+                        echo "Running Ansible playbook for users_backend..."
+                        ansible-playbook -i inventory.yml ./ops/playbook-users_backend.yml
                     '''
                 }
             }
@@ -28,8 +44,8 @@ pipeline {
             steps {
                 dir('Chapter10/thoughts_backend') {
                     sh '''
-                        docker-compose up -d > docker-compose.log 2>&1
-                        echo "Logs captured in thoughts_backend/docker-compose.log"
+                        echo "Running Ansible playbook for thoughts_backend..."
+                        ansible-playbook -i inventory.yml playbook-thoughts_backend.yml
                     '''
                 }
             }
@@ -38,8 +54,8 @@ pipeline {
             steps {
                 dir('Chapter10/rsyslog') {
                     sh '''
-                        docker-compose up -d > docker-compose.log 2>&1
-                        echo "Logs captured in rsyslog/docker-compose.log"
+                        echo "Running Ansible playbook for rsyslog..."
+                        ansible-playbook -i inventory.yml playbook-rsyslog.yml
                     '''
                 }
             }
@@ -48,8 +64,8 @@ pipeline {
             steps {
                 dir('Chapter10/frontend') {
                     sh '''
-                        docker-compose up -d > docker-compose.log 2>&1
-                        echo "Logs captured in frontend/docker-compose.log"
+                        echo "Running Ansible playbook for frontend..."
+                        ansible-playbook -i inventory.yml playbook-frontend.yml
                     '''
                 }
             }
@@ -58,7 +74,7 @@ pipeline {
     post {
         always {
             echo "Pipeline execution completed."
-            archiveArtifacts artifacts: '**/docker-compose.log', allowEmptyArchive: true
+            archiveArtifacts artifacts: '**/ansible-playbook.log', allowEmptyArchive: true
         }
     }
 }
