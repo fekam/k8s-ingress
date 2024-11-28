@@ -38,7 +38,7 @@ pipeline {
         }
         stage('Start thoughts_backend') {
             steps {
-                dir('Chapter10) {
+                dir('Chapter10') {
                     sh '''
                         echo "Running Ansible playbook for thoughts_backend..."
                         ansible-playbook -i inventory ops/playbook-thoughts_backend.yml
@@ -58,7 +58,7 @@ pipeline {
         }
         stage('Start frontend') {
             steps {
-                dir('Chapter10) {
+                dir('Chapter10') {
                     sh '''
                         echo "Running Ansible playbook for frontend..."
                         ansible-playbook -i inventory ops/playbook-frontend.yml
